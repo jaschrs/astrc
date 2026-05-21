@@ -1,12 +1,11 @@
 #include <iostream>
 #include "../include/ConfigParser.hpp"
+#include "../include/AssetMapper.hpp"
 
 int main(int argc, char* argv[]) {
 
     ConfigParser initializer;
-    bool canContinue = initializer.parseArgs(argc, argv);
-
-    if (canContinue) {
+    if (initializer.parseArgs(argc, argv)) {
         for (const auto &element : initializer.getIgnoredSearchDirectories()) {
             std::cout << element << " ";
         }
@@ -23,7 +22,10 @@ int main(int argc, char* argv[]) {
     else {
         initializer.printErrorMessage();
         std::cout << std::endl;
+        exit(1);
     }
+
+    AssetMapper map(initializer.getSearchableRootDirectory(), initializer.getTargetExtensions(), initializer.getIgnoredSearchDirectories());
 
     return 0;
 }
