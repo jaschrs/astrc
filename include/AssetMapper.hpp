@@ -16,26 +16,15 @@ class AssetMapper {
         const std::filesystem::path rootDirectory;
         const std::unordered_set<std::string> targetExtensions;
         const std::unordered_set<std::string> ignoredSearchDirectories;
-        bool isValid;
 
         std::string errorMessage;
 
     public:
         AssetMapper(std::filesystem::path &rootDirectory, std::unordered_set<std::string> &targetExtensions, std::unordered_set<std::string> &ignoredSearchDirectories);
 
-        bool mapDirectory();
+        void mapDirectory();
 
         std::unordered_map<std::string, std::vector<std::filesystem::path>>& getAssets();
-
-        bool isIgnoredDirectory(std::string &directory);
-
-        bool isAnExtension(std::string &extension);
-
-        bool isMapValid();
-
-        void printErrorMessage();
-
-        //std::string extractFilename(std::filesystem::path &path);
 };
 
 

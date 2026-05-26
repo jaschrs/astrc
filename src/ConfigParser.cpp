@@ -24,7 +24,7 @@ namespace {
 
     bool verifySubdirectoriesExistence(std::filesystem::path &directory, std::unordered_set<std::string> &set) {
         for (const auto &subdirectory : set) {
-            if (!std::filesystem::is_directory(directory.generic_string() + subdirectory)) {
+            if (!std::filesystem::is_directory(directory.generic_string() + "/" + subdirectory)) {
                 return false;
             }
         }
