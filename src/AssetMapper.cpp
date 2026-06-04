@@ -7,10 +7,9 @@
 #include "../include/AssetMapper.hpp"
 
 AssetMapper::AssetMapper(std::filesystem::path &rootDirectory, std::unordered_set<std::string> &targetExtensions,
-    std::unordered_set<std::string> &ignoredSearchDirectories) :
-    rootDirectory(rootDirectory), targetExtensions(targetExtensions), ignoredSearchDirectories(ignoredSearchDirectories){}
+    std::unordered_set<std::string> &ignoredSearchDirectories){
 
-void AssetMapper::mapDirectory() {
+    std::cout << "Mapping static files & ignored specified folders...\n";
     // manual directory iteration
     for (auto iterator = std::filesystem::recursive_directory_iterator(rootDirectory);
         iterator != std::filesystem::recursive_directory_iterator();
@@ -25,6 +24,15 @@ void AssetMapper::mapDirectory() {
 
         if (iterator->is_regular_file() && targetExtensions.contains(iterator->path().extension().string())) {
             assets[iterator->path().filename().string()].push_back(iterator->path()); // will create if not existent
+        }
+    }
+}
+
+AssetMapper::AssetMapper(std::filesystem::path &rootDirectory, std::unordered_set<std::string> &targetExtensions) {
+    std::cout << "Mapping static files...\n";
+    for (const auto &file : std::filesystem::recursive_directory_iterator(rootDirectory)) {
+        if (file.is_regular_file() && targetExtensions.contains(file.path().extension().string())) {
+            assets[file.path().filename().string()].push_back(file.path()); // will create if not existent
         }
     }
 }
