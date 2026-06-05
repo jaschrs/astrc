@@ -8,7 +8,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include "ConfigParser.hpp"
 #include "third_party/aho_corasick.hpp"
 
 class CodeScanner {
@@ -23,14 +22,14 @@ class CodeScanner {
 
     public:
         CodeScanner(std::filesystem::path &searchableRootDirectory, std::unordered_map<std::string, std::vector<std::filesystem::path>> &assets, std::unordered_set<std::string> &ignoredSearchDirectories, std::unordered_set<std::string>& scannableExtensions);
-        CodeScanner(std::filesystem::path &searchableRootDirectory, std::unordered_map<std::string, std::vector<std::filesystem::path>> &assets, std::unordered_set<std::string> &set, ConfigStatus status);
+        CodeScanner(std::filesystem::path &searchableRootDirectory, std::unordered_map<std::string, std::vector<std::filesystem::path>> &assets, std::unordered_set<std::string> &set);
         CodeScanner(std::filesystem::path &searchableRootDirectory, std::unordered_map<std::string, std::vector<std::filesystem::path>> &assets);
 
         void execute();
 
         std::unordered_map<std::string, std::vector<std::filesystem::path>>& getLeftoverAssets();
 
-        size_t& getBytesProcessed();
+        size_t getBytesProcessed() const;
 
 };
 

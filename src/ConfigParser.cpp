@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include "../include/globals.hpp"
 
 ConfigStatus ConfigParser::parseArgs(char* argv[]) {
 
@@ -19,27 +20,28 @@ ConfigStatus ConfigParser::parseArgs(char* argv[]) {
         std::cerr << "\t-h, --help\tPrint this help message\n\n";
         std::cerr << "\t-v, --version\tPrint version number \n\n";
         std::cerr << "\tExample: \tStaticTrace ./MyProject \n\n";
-        return configStatus;
+        return status;
     }
     if (arg == "-v" || arg == "--version") {
         std::cerr << "2026.0.1\n\n";
-        return configStatus;
+        return status;
     }
     if (std::filesystem::is_directory(arg) && std::filesystem::exists(arg + "/statictraceconfig.json")) {
         searchableRootDirectory = arg;
         std::cout << "Found config file, attempting to parse...\n";
         std::ifstream config(searchableRootDirectory.generic_string() + "/statictraceconfig.json");
         parseConfigFile(config);
+        if (status == FAILURE) return status;
     }
     else {
         errorMessage = "Invalid arguments: Unable to find specified directory or config file";
-        return configStatus;
+        return status;
     }
 
-    configStatus = !verifySubdirectoriesExistence(searchableRootDirectory, ignoredSearchDirectories) ? ConfigStatus::FAILURE : configStatus;
-    errorMessage = configStatus == ConfigStatus::FAILURE ? "Invalid config: One or more subdirectories in given root does not exist" : "";
+    status = !verifySubdirectoriesExistence(searchableRootDirectory, ignoredSearchDirectories) ? FAILURE : status;
+    errorMessage = status == FAILURE ? "Invalid config: One or more subdirectories in given root does not exist" : "";
 
-    return configStatus;
+    return status;
 }
 
 void ConfigParser::parseConfigFile(std::ifstream &configFile) {
@@ -49,49 +51,64 @@ void ConfigParser::parseConfigFile(std::ifstream &configFile) {
     }
     catch (std::exception& e) {
         std::cerr << e.what() << "\n";
-        configStatus = ConfigStatus::FAILURE;
+        status = FAILURE;
         return;
     }
 
-    if (!(config.contains("targetExtensions") && config["targetExtensions"].is_array())) {
+    if (!(config.contains("targetExtensions") || config["targetExtensions"].is_array())) {
         errorMessage = "Missing 'targetExtensions' array";
-        configStatus = ConfigStatus::FAILURE;
+        status = FAILURE;
         return;
     }
 
     if (!(config.contains("scanExtensions") || config["scanExtensions"].is_array())) {
-        configStatus = ConfigStatus::MISSING_SCAN_EXTENSIONS;
+        status = MISSING_SCAN_EXTENSIONS;
+        std::cout << "Missing 'scanExtensions' array.. continuing\n";
     }
 
     if (!(config.contains("ignoreDirectories") || config["ignoreDirectories"].is_array())) {
-        if (configStatus == ConfigStatus::MISSING_SCAN_EXTENSIONS) configStatus = ConfigStatus::MISSING_BOTH;
-        else configStatus = ConfigStatus::MISSING_IGNORE_DIRECTORIES;
+        if (status == MISSING_SCAN_EXTENSIONS) {
+            status = MISSING_BOTH;
+            std::cout << "Missing both 'scanExtensions' & 'ignoreDirectories' array.. continuing\n";
+        }
+        else {
+            status = MISSING_IGNORE_DIRECTORIES;
+            std::cout << "Missing 'ignoreDirectories' array.. continuing\n";
+        }
+    }
+    if (status == FAILURE) {
+        status = SUCCESS;
+        std::cout << "Found all available arrays.. continuing\n";
     }
 
     try {
         for (const auto& entry : config["targetExtensions"]) {
             targetExtensions.insert(entry.get<std::string>());
         }
+        std::cout << "Parsed targetExtensions..\n";
 
-        if (configStatus == ConfigStatus::SUCCESS || configStatus == ConfigStatus::MISSING_IGNORE_DIRECTORIES) {
+        if (status == SUCCESS || status == MISSING_IGNORE_DIRECTORIES) {
             for (const auto& entry : config["scanExtensions"]) {
                 scannableExtensions.insert(entry.get<std::string>());
             }
+            std::cout << "Parsed scanExtensions..\n";
         }
 
-        if (configStatus == ConfigStatus::SUCCESS || configStatus == ConfigStatus::MISSING_SCAN_EXTENSIONS) {
+        if (status == SUCCESS || status == MISSING_SCAN_EXTENSIONS) {
             for (const auto& entry : config["ignoreDirectories"]) {
                 ignoredSearchDirectories.insert(entry.get<std::string>());
             }
+            std::cout << "Parsed ignoreDirectories..\n";
         }
+
     }
     catch (std::exception& e) {
-        configStatus = ConfigStatus::FAILURE;
+        status = FAILURE;
         errorMessage = "Error parsing config file";
         return;
     }
 
-    if (configStatus == ConfigStatus::FAILURE) configStatus = ConfigStatus::SUCCESS;
+    if (status == FAILURE) status = SUCCESS;
 }
 
 bool ConfigParser::verifySubdirectoriesExistence(std::filesystem::path &directory, std::unordered_set<std::string> &set) {
@@ -103,7 +120,7 @@ bool ConfigParser::verifySubdirectoriesExistence(std::filesystem::path &director
     return true;
 }
 
-ConfigParser::ConfigParser() : configStatus(ConfigStatus::FAILURE) {}
+ConfigParser::ConfigParser() = default;
 
 std::filesystem::path& ConfigParser::getSearchableRootDirectory() {return searchableRootDirectory;}
 

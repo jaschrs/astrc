@@ -22,7 +22,7 @@ AssetMapper::AssetMapper(std::filesystem::path &rootDirectory, std::unordered_se
             continue;
         }
 
-        if (iterator->is_regular_file() && targetExtensions.contains(iterator->path().extension().string())) {
+        if (iterator->is_regular_file() && targetExtensions.contains(iterator->path().extension().string()) && iterator->path().filename().string() != "statictraceconfig.json") {
             assets[iterator->path().filename().string()].push_back(iterator->path()); // will create if not existent
         }
     }

@@ -10,6 +10,7 @@ add_executable(StaticTrace src/main.cpp
         src/ConfigParser.cpp
         src/AssetMapper.cpp
         src/CodeScanner.cpp
+        include/globals.hpp
 )
 
 target_compile_options(StaticTrace PRIVATE "-O1")
