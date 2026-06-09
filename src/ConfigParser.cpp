@@ -7,10 +7,28 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include "../include/globals.hpp"
 
-ConfigStatus ConfigParser::parseArgs(char* argv[]) {
+std::unordered_set<std::string> defaultScannableExtensions = {
+    ".html", ".htm", ".css",
+    ".scss", ".sass", ".less",
+    ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs",
+    ".vue", ".svelte", ".astro",
+    ".cpp", ".hpp", ".c", ".h", ".cs", ".java", ".go", ".rs",
+    ".py", ".rb", ".php", ".sh",
+    ".json", ".xml", ".csv",
+    ".yaml", ".yml", ".toml", ".ini", ".env",
+    ".md", ".txt",
+    ".swift", ".kt", ".dart", ".xaml",
+};
 
+ConfigStatus status = FAILURE;
+
+ConfigStatus ConfigParser::parseArgs(int argc, char* argv[]) {
+
+    if (argc == 1) {
+        errorMessage = "Missing arguments";
+        return status;
+    }
     std::string arg = argv[1];
 
     // very ugly parsing
@@ -29,7 +47,7 @@ ConfigStatus ConfigParser::parseArgs(char* argv[]) {
     if (std::filesystem::is_directory(arg) && std::filesystem::exists(arg + "/statictraceconfig.json")) {
         searchableRootDirectory = arg;
         std::cout << "Found config file, attempting to parse...\n";
-        std::ifstream config(searchableRootDirectory.generic_string() + "/statictraceconfig.json");
+        std::ifstream config(searchableRootDirectory / "statictraceconfig.json");
         parseConfigFile(config);
         if (status == FAILURE) return status;
     }
@@ -37,9 +55,6 @@ ConfigStatus ConfigParser::parseArgs(char* argv[]) {
         errorMessage = "Invalid arguments: Unable to find specified directory or config file";
         return status;
     }
-
-    status = !verifySubdirectoriesExistence(searchableRootDirectory, ignoredSearchDirectories) ? FAILURE : status;
-    errorMessage = status == FAILURE ? "Invalid config: One or more subdirectories in given root does not exist" : "";
 
     return status;
 }
@@ -55,52 +70,53 @@ void ConfigParser::parseConfigFile(std::ifstream &configFile) {
         return;
     }
 
-    if (!(config.contains("targetExtensions") || config["targetExtensions"].is_array())) {
+    const bool hasTargetExtensions = config.contains("targetExtensions") && config["targetExtensions"].is_array();
+    const bool hasScanExtensions = config.contains("scanExtensions") && config["scanExtensions"].is_array();
+    const bool hasIgnoreDirectories = config.contains("ignoreDirectories") && config["ignoreDirectories"].is_array();
+
+    if (!hasTargetExtensions) {
         errorMessage = "Missing 'targetExtensions' array";
         status = FAILURE;
         return;
     }
 
-    if (!(config.contains("scanExtensions") || config["scanExtensions"].is_array())) {
+    if (!hasScanExtensions && !hasIgnoreDirectories) {
+        status = MISSING_BOTH;
+        std::cout << "Missing both 'scanExtensions' & 'ignoreDirectories' array.. continuing\n";
+        goto parse;
+    }
+
+    if (!hasScanExtensions) {
         status = MISSING_SCAN_EXTENSIONS;
-        std::cout << "Missing 'scanExtensions' array.. continuing\n";
+        scannableExtensions = std::move(defaultScannableExtensions);
+        std::cout << "Missing 'scanExtensions' array.. will use default\n";
     }
 
-    if (!(config.contains("ignoreDirectories") || config["ignoreDirectories"].is_array())) {
-        if (status == MISSING_SCAN_EXTENSIONS) {
-            status = MISSING_BOTH;
-            std::cout << "Missing both 'scanExtensions' & 'ignoreDirectories' array.. continuing\n";
-        }
-        else {
-            status = MISSING_IGNORE_DIRECTORIES;
-            std::cout << "Missing 'ignoreDirectories' array.. continuing\n";
-        }
-    }
-    if (status == FAILURE) {
-        status = SUCCESS;
-        std::cout << "Found all available arrays.. continuing\n";
+    if (!hasIgnoreDirectories) {
+        status = MISSING_IGNORE_DIRECTORIES;
+        std::cout << "Missing 'ignoreDirectories' array.. continuing\n";
     }
 
+parse:
     try {
         for (const auto& entry : config["targetExtensions"]) {
             targetExtensions.insert(entry.get<std::string>());
         }
         std::cout << "Parsed targetExtensions..\n";
 
-        if (status == SUCCESS || status == MISSING_IGNORE_DIRECTORIES) {
-            for (const auto& entry : config["scanExtensions"]) {
-                scannableExtensions.insert(entry.get<std::string>());
-            }
-            std::cout << "Parsed scanExtensions..\n";
-        }
-
-        if (status == SUCCESS || status == MISSING_SCAN_EXTENSIONS) {
+        if (hasIgnoreDirectories) {
             for (const auto& entry : config["ignoreDirectories"]) {
                 ignoredSearchDirectories.insert(entry.get<std::string>());
             }
             std::cout << "Parsed ignoreDirectories..\n";
         }
 
+        if (hasScanExtensions) {
+            for (const auto& entry : config["scanExtensions"]) {
+                scannableExtensions.insert(entry.get<std::string>());
+            }
+            std::cout << "Parsed scanExtensions..\n";
+        }
     }
     catch (std::exception& e) {
         status = FAILURE;
@@ -111,23 +127,14 @@ void ConfigParser::parseConfigFile(std::ifstream &configFile) {
     if (status == FAILURE) status = SUCCESS;
 }
 
-bool ConfigParser::verifySubdirectoriesExistence(std::filesystem::path &directory, std::unordered_set<std::string> &set) {
-    for (const auto &subdirectory : set) {
-        if (!std::filesystem::is_directory(directory.generic_string() + "/" + subdirectory)) {
-            return false;
-        }
-    }
-    return true;
-}
-
 ConfigParser::ConfigParser() = default;
 
-std::filesystem::path& ConfigParser::getSearchableRootDirectory() {return searchableRootDirectory;}
+const std::filesystem::path& ConfigParser::getSearchableRootDirectory() const {return searchableRootDirectory;}
 
-std::unordered_set<std::string>& ConfigParser::getTargetExtensions() {return targetExtensions;}
+const std::unordered_set<std::string>& ConfigParser::getTargetExtensions() const {return targetExtensions;}
 
-std::unordered_set<std::string>& ConfigParser::getIgnoredSearchDirectories() {return ignoredSearchDirectories;}
+const std::unordered_set<std::string>& ConfigParser::getIgnoredSearchDirectories() const {return ignoredSearchDirectories;}
 
-std::unordered_set<std::string>& ConfigParser::getScannableExtensions() {return scannableExtensions;}
+const std::unordered_set<std::string>& ConfigParser::getScannableExtensions() const {return scannableExtensions;}
 
-std::string ConfigParser::getErrorMessage() {return errorMessage;}
+const std::string ConfigParser::getErrorMessage() const {return errorMessage;}

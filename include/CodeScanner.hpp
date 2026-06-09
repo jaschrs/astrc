@@ -21,13 +21,14 @@ class CodeScanner {
         size_t bytesProcessed;
 
     public:
-        CodeScanner(std::filesystem::path &searchableRootDirectory, std::unordered_map<std::string, std::vector<std::filesystem::path>> &assets, std::unordered_set<std::string> &ignoredSearchDirectories, std::unordered_set<std::string>& scannableExtensions);
-        CodeScanner(std::filesystem::path &searchableRootDirectory, std::unordered_map<std::string, std::vector<std::filesystem::path>> &assets, std::unordered_set<std::string> &set);
-        CodeScanner(std::filesystem::path &searchableRootDirectory, std::unordered_map<std::string, std::vector<std::filesystem::path>> &assets);
+        CodeScanner(const std::filesystem::path &searchableRootDirectory,
+            const std::unordered_map<std::string, std::vector<std::filesystem::path>> &assets,
+            const std::unordered_set<std::string> &ignoredSearchDirectories,
+            const std::unordered_set<std::string>& scannableExtensions);
 
         void execute();
 
-        std::unordered_map<std::string, std::vector<std::filesystem::path>>& getLeftoverAssets();
+        const std::unordered_map<std::string, std::vector<std::filesystem::path>>& getLeftoverAssets() const;
 
         size_t getBytesProcessed() const;
 

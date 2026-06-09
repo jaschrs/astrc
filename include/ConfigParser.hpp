@@ -6,7 +6,14 @@
 #define STATICTRACE_CONFIGPARSES_H
 #include <filesystem>
 #include <unordered_set>
-#include "globals.hpp"
+
+enum ConfigStatus : uint8_t {
+    SUCCESS = 0, // found all arguments
+    MISSING_SCAN_EXTENSIONS = 1, // only "scanExtensions" key is missing
+    MISSING_IGNORE_DIRECTORIES = 2, // only "ignoreDirectories" key is missing
+    MISSING_BOTH = 3, // both "scanExtensions" key and "ignoreDirectories" key is missing
+    FAILURE = 4 // other failure
+};
 
 class ConfigParser {
 
@@ -18,22 +25,21 @@ class ConfigParser {
         std::string errorMessage;
 
         void parseConfigFile(std::ifstream &configFile);
-        bool verifySubdirectoriesExistence(std::filesystem::path &directory, std::unordered_set<std::string> &set);
 
     public:
         ConfigParser();
 
-        ConfigStatus parseArgs(char* argv[]);
+        ConfigStatus parseArgs(int argc, char* argv[]);
 
-        std::filesystem::path& getSearchableRootDirectory();
+        const std::filesystem::path& getSearchableRootDirectory() const;
 
-        std::unordered_set<std::string>& getTargetExtensions();
+        const std::unordered_set<std::string>& getTargetExtensions() const;
 
-        std::unordered_set<std::string>& getIgnoredSearchDirectories();
+        const std::unordered_set<std::string>& getIgnoredSearchDirectories() const;
 
-        std::unordered_set<std::string>& getScannableExtensions();
+        const std::unordered_set<std::string>& getScannableExtensions() const;
 
-        std::string getErrorMessage();
+        const std::string getErrorMessage() const;
 };
 
 

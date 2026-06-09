@@ -15,10 +15,11 @@ class AssetMapper {
         std::unordered_map<std::string, std::vector<std::filesystem::path>> assets;
 
     public:
-        AssetMapper(std::filesystem::path &rootDirectory, std::unordered_set<std::string> &targetExtensions, std::unordered_set<std::string> &ignoredSearchDirectories);
-        AssetMapper(std::filesystem::path &rootDirectory, std::unordered_set<std::string> &targetExtensions);
+        AssetMapper(const std::filesystem::path &rootDirectory,
+            const std::unordered_set<std::string> &targetExtensions,
+            const std::unordered_set<std::string> &ignoredSearchDirectories);
 
-        std::unordered_map<std::string, std::vector<std::filesystem::path>>& getAssets();
+        const std::unordered_map<std::string, std::vector<std::filesystem::path>>& getAssets() const;
 };
 
 
