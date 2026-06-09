@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(astrc)
-set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_CXX_STANDARD 20)
 
 add_executable(astrc src/main.cpp
         include/Parser.hpp
