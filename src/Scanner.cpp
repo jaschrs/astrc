@@ -2,7 +2,7 @@
 // Created by Jasper on 2026-05-19.
 //
 
-#include "../include/CodeScanner.hpp"
+#include "../include/Scanner.hpp"
 #include <filesystem>
 #include <unordered_set>
 #include <unordered_map>
@@ -11,7 +11,7 @@
 #include "../include/third_party/aho_corasick.hpp"
 #include "../include/third_party/mio.hpp"
 
-CodeScanner::CodeScanner(const std::filesystem::path &searchableRootDirectory,
+Scanner::Scanner(const std::filesystem::path &searchableRootDirectory,
     const std::unordered_map<std::string, std::vector<std::filesystem::path>> &assets,
     const std::unordered_set<std::string> &ignoredSearchDirectories,
     const std::unordered_set<std::string>& scannableExtensions) :
@@ -24,7 +24,7 @@ CodeScanner::CodeScanner(const std::filesystem::path &searchableRootDirectory,
     for (const auto &pair : assets) trie.insert(pair.first);
 }
 
-void CodeScanner::execute() {
+void Scanner::execute() {
 
     for (auto iterator = std::filesystem::recursive_directory_iterator(searchableRootDirectory);
         iterator != std::filesystem::recursive_directory_iterator();
@@ -60,10 +60,10 @@ void CodeScanner::execute() {
     }
 }
 
-const std::unordered_map<std::string, std::vector<std::filesystem::path>>& CodeScanner::getLeftoverAssets() const {
+const std::unordered_map<std::string, std::vector<std::filesystem::path>>& Scanner::getLeftoverAssets() const {
     return assets;
 }
 
-size_t CodeScanner::getBytesProcessed() const {
+size_t Scanner::getBytesProcessed() const {
     return bytesProcessed;
 }

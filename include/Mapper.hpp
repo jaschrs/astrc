@@ -9,13 +9,13 @@
 #include <unordered_map>
 #include <unordered_set>
 
-class AssetMapper {
+class Mapper {
 
     private:
         std::unordered_map<std::string, std::vector<std::filesystem::path>> assets;
 
     public:
-        AssetMapper(const std::filesystem::path &rootDirectory,
+        Mapper(const std::filesystem::path &rootDirectory,
             const std::unordered_set<std::string> &targetExtensions,
             const std::unordered_set<std::string> &ignoredSearchDirectories);
 

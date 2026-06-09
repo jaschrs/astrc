@@ -15,7 +15,7 @@ enum ConfigStatus : uint8_t {
     FAILURE = 4 // other failure
 };
 
-class ConfigParser {
+class Parser {
 
     private:
         std::filesystem::path searchableRootDirectory;
@@ -27,7 +27,7 @@ class ConfigParser {
         void parseConfigFile(std::ifstream &configFile);
 
     public:
-        ConfigParser();
+        Parser();
 
         ConfigStatus parseArgs(int argc, char* argv[]);
 

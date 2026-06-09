@@ -2,7 +2,7 @@
 // Created by Jasper on 2026-05-19.
 //
 
-#include "../include/ConfigParser.hpp"
+#include "../include/Parser.hpp"
 #include "../include/third_party/json.hpp"
 #include <string>
 #include <iostream>
@@ -23,7 +23,7 @@ std::unordered_set<std::string> defaultScannableExtensions = {
 
 ConfigStatus status = FAILURE;
 
-ConfigStatus ConfigParser::parseArgs(int argc, char* argv[]) {
+ConfigStatus Parser::parseArgs(int argc, char* argv[]) {
 
     if (argc == 1) {
         errorMessage = "Missing arguments";
@@ -59,7 +59,7 @@ ConfigStatus ConfigParser::parseArgs(int argc, char* argv[]) {
     return status;
 }
 
-void ConfigParser::parseConfigFile(std::ifstream &configFile) {
+void Parser::parseConfigFile(std::ifstream &configFile) {
     nlohmann::json config;
     try {
         config = nlohmann::json::parse(configFile);
@@ -127,14 +127,14 @@ parse:
     if (status == FAILURE) status = SUCCESS;
 }
 
-ConfigParser::ConfigParser() = default;
+Parser::Parser() = default;
 
-const std::filesystem::path& ConfigParser::getSearchableRootDirectory() const {return searchableRootDirectory;}
+const std::filesystem::path& Parser::getSearchableRootDirectory() const {return searchableRootDirectory;}
 
-const std::unordered_set<std::string>& ConfigParser::getTargetExtensions() const {return targetExtensions;}
+const std::unordered_set<std::string>& Parser::getTargetExtensions() const {return targetExtensions;}
 
-const std::unordered_set<std::string>& ConfigParser::getIgnoredSearchDirectories() const {return ignoredSearchDirectories;}
+const std::unordered_set<std::string>& Parser::getIgnoredSearchDirectories() const {return ignoredSearchDirectories;}
 
-const std::unordered_set<std::string>& ConfigParser::getScannableExtensions() const {return scannableExtensions;}
+const std::unordered_set<std::string>& Parser::getScannableExtensions() const {return scannableExtensions;}
 
-const std::string ConfigParser::getErrorMessage() const {return errorMessage;}
+const std::string Parser::getErrorMessage() const {return errorMessage;}

@@ -1,11 +1,11 @@
 #include <iostream>
-#include "../include/ConfigParser.hpp"
-#include "../include/AssetMapper.hpp"
-#include "../include/CodeScanner.hpp"
+#include "../include/Parser.hpp"
+#include "../include/Mapper.hpp"
+#include "../include/Scanner.hpp"
 
 int main(int argc, char* argv[]) {
 
-    ConfigParser parser;
+    Parser parser;
     const ConfigStatus status = parser.parseArgs(argc, argv);
     if (status == FAILURE) {
         std::cout << parser.getErrorMessage() << "\n\n";
@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
     std::cout << "\nDebug status: " << static_cast<int>(status) << "\n\n";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    AssetMapper map(
+    Mapper map(
         parser.getSearchableRootDirectory(),
         parser.getTargetExtensions(),
         parser.getIgnoredSearchDirectories()
@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
     std::cout << "\n";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    CodeScanner exe(
+    Scanner exe(
         parser.getSearchableRootDirectory(),
         map.getAssets(),
         parser.getIgnoredSearchDirectories(),

@@ -4,10 +4,10 @@
 
 #include <filesystem>
 #include <iostream>
-#include "../include/AssetMapper.hpp"
+#include "../include/Mapper.hpp"
 
-AssetMapper::AssetMapper(const std::filesystem::path &rootDirectory, const std::unordered_set<std::string> &targetExtensions,
-    const std::unordered_set<std::string> &ignoredSearchDirectories){
+Mapper::Mapper(const std::filesystem::path &rootDirectory, const std::unordered_set<std::string> &targetExtensions,
+               const std::unordered_set<std::string> &ignoredSearchDirectories){
 
     std::cout << "Mapping static files & ignored specified folders...\n";
     // manual directory iteration
@@ -34,6 +34,6 @@ AssetMapper::AssetMapper(const std::filesystem::path &rootDirectory, const std::
     }
 }
 
-const std::unordered_map<std::string, std::vector<std::filesystem::path>>& AssetMapper::getAssets() const {
+const std::unordered_map<std::string, std::vector<std::filesystem::path>>& Mapper::getAssets() const {
     return assets;
 }

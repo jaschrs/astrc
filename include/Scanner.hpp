@@ -10,7 +10,7 @@
 #include <vector>
 #include "third_party/aho_corasick.hpp"
 
-class CodeScanner {
+class Scanner {
 
     private:
         std::filesystem::path searchableRootDirectory;
@@ -21,7 +21,7 @@ class CodeScanner {
         size_t bytesProcessed;
 
     public:
-        CodeScanner(const std::filesystem::path &searchableRootDirectory,
+        Scanner(const std::filesystem::path &searchableRootDirectory,
             const std::unordered_map<std::string, std::vector<std::filesystem::path>> &assets,
             const std::unordered_set<std::string> &ignoredSearchDirectories,
             const std::unordered_set<std::string>& scannableExtensions);
