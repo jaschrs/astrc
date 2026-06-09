@@ -33,11 +33,11 @@ ConfigStatus Parser::parseArgs(int argc, char* argv[]) {
 
     // very ugly parsing
     if (arg == "-h" || arg == "--help") {
-        std::cerr << "Usage: StaticTrace <DIRECTORY>\n\n";
+        std::cerr << "Usage: astrc <DIRECTORY>\n\n";
         std::cerr << "Configurations:\n\n";
         std::cerr << "\t-h, --help\tPrint this help message\n\n";
         std::cerr << "\t-v, --version\tPrint version number \n\n";
-        std::cerr << "\tExample: \tStaticTrace ./MyProject \n\n";
+        std::cerr << "\tExample: \tastrc ./MyProject \n\n";
         return status;
     }
     if (arg == "-v" || arg == "--version") {
