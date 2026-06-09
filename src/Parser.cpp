@@ -44,14 +44,22 @@ ConfigStatus Parser::parseArgs(int argc, char* argv[]) {
         std::cerr << "2026.0.1\n\n";
         return status;
     }
-    if (std::filesystem::is_directory(arg) && std::filesystem::exists(arg + "/statictraceconfig.json")) {
+    if (std::filesystem::is_directory(arg)) {
         searchableRootDirectory = arg;
+
+        // check for valid config file
+        std::filesystem::path configPath;
+        if (std::filesystem::exists(searchableRootDirectory / ".astrc.json")) configPath = searchableRootDirectory / ".astrc.json";
+        else if (std::filesystem::exists(searchableRootDirectory / ".astrc")) configPath = searchableRootDirectory / ".astrc";
+        else goto exit;
+
         std::cout << "Found config file, attempting to parse...\n";
-        std::ifstream config(searchableRootDirectory / "statictraceconfig.json");
+        std::ifstream config(configPath);
         parseConfigFile(config);
         if (status == FAILURE) return status;
     }
     else {
+        exit:
         errorMessage = "Invalid arguments: Unable to find specified directory or config file";
         return status;
     }
@@ -62,7 +70,7 @@ ConfigStatus Parser::parseArgs(int argc, char* argv[]) {
 void Parser::parseConfigFile(std::ifstream &configFile) {
     nlohmann::json config;
     try {
-        config = nlohmann::json::parse(configFile);
+        config = nlohmann::json::parse(configFile, nullptr, true, true); // enable JSON comment support
     }
     catch (std::exception& e) {
         std::cerr << e.what() << "\n";

@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 4.2)
-project(StaticTrace)
+project(astrc)
 
 set(CMAKE_CXX_STANDARD 26)
 
-add_executable(StaticTrace src/main.cpp
+add_executable(astrc src/main.cpp
         include/Parser.hpp
         include/Mapper.hpp
         include/Scanner.hpp
@@ -12,4 +12,4 @@ add_executable(StaticTrace src/main.cpp
         src/Scanner.cpp
 )
 
-target_compile_options(StaticTrace PRIVATE "-O1")
+target_compile_options(astrc PRIVATE "-O1")
