@@ -38,7 +38,7 @@ void Scanner::execute() {
         if (iterator->is_regular_file() &&
             scannableExtensions.contains(iterator->path().extension().string()) &&
             std::filesystem::file_size(iterator->path()) > 0 &&
-            iterator->path().filename().string() != "statictraceconfig.json") {
+            (iterator->path().filename().string() != ".astrc.json" || iterator->path().filename().string() != ".astrc")) {
 
             std::cout << "Searching file: " << iterator->path().filename().string() << "\n";
 
