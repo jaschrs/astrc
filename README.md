@@ -8,7 +8,7 @@ astrc (asset trace) is a highly optimized command-line tool to find unreferenced
 
 ## How it Works
 
-1. Parses given config file to identify file mappable file extensions (the files that will be searched for in source files) e.g. static images in a web project. Optionally identifies specified source file extensions to search in (e.g. search for .png in .jsx files). Optionally ignores specified folders to optimize search (e.g. ignore /build, /node_modules).
+1. Parses given config file to identify mappable file extensions (the files that will be searched for in source files) e.g. static images in a web project. Optionally identifies specified source file extensions to search in (e.g. search for .png in .jsx files). Optionally ignores specified folders to optimize search (e.g. ignore /build, /node_modules).
 2. Recursively explores given root directory & creates a map of all given file extensions.
 3. Recursively explores root directory again, instead reading source files for mapped assets.
 4. If any mapped assets are found unreferenced, those are the files holding zero value in your project. 
